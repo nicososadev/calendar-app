@@ -4,7 +4,9 @@ import { LoginPage } from '../auth/LoginPage'
 import { CalendarPage } from '../calendar/CalendarPage'
 
 export const AppRouter = () => {
+
     return (
+        
         <Router>
             <div>
                 <Switch>

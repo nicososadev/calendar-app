@@ -4,6 +4,7 @@ import moment from 'moment'
 import DateTimePicker from 'react-datetime-picker'
 
 import '../../styles/calendar/modal.css'
+import { useForm } from '../../hooks/useForm';
 
 const customStyles = {
     content: {
@@ -24,6 +25,17 @@ export const CalendarModal = () => {
 
     const [dateStart, setDateStart] = useState( now.toDate() )
     const [dateEnd, setDateEnd] = useState( now.add(1, 'hour').toDate() )
+
+    const [formValues, handleInputChange] = useForm({
+        title: 'Evento',
+        notes: '',
+        start: now.toDate(),
+        end: now.add(1,'hours').toDate()
+    })
+
+    const { title, notes } = formValues
+
+
 
     const closeModal = () => {
     }
@@ -69,6 +81,8 @@ export const CalendarModal = () => {
                         className="form-control"
                         placeholder="Título del evento"
                         name="title"
+                        value={title}
+                        onChange={handleInputChange}
                         autoComplete="off"
                     />
                     <small id="emailHelp" className="form-text text-muted">Una descripción corta</small>
@@ -81,6 +95,8 @@ export const CalendarModal = () => {
                         placeholder="Notas"
                         rows="5"
                         name="notes"
+                        value={notes}
+                        onChange={handleInputChange}
                     ></textarea>
                     <small id="emailHelp" className="form-text text-muted">Información adicional</small>
                 </div>
