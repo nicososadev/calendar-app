@@ -1,10 +1,13 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Modal from 'react-modal';
 import moment from 'moment'
 import DateTimePicker from 'react-datetime-picker'
 
 import '../../styles/calendar/modal.css'
-import { useForm } from '../../hooks/useForm';
+import Swal from 'sweetalert2';
+import { useDispatch, useSelector } from 'react-redux';
+import { uiCloseModal } from '../../actions/ui';
+import { cleanActiveEvent, createEvent, updateEvent } from '../../actions/events';
 
 const customStyles = {
     content: {
@@ -21,37 +24,109 @@ Modal.setAppElement('#root')
 
 const now = moment().minutes(0).seconds(0).add(1, 'hours')
 
+const initEvent = {
+    title: '',
+    notes: '',
+    start: now.toDate(),
+    end: now.add(1,'hours').toDate()
+}
+
 export const CalendarModal = () => {
+    
+    const { modalOpen } = useSelector(state => state.ui)
+    const { activeEvent } = useSelector(state => state.calendar)
+
 
     const [dateStart, setDateStart] = useState( now.toDate() )
     const [dateEnd, setDateEnd] = useState( now.add(1, 'hour').toDate() )
+    const [titleValid, setTitleValid] = useState(true)
 
-    const [formValues, handleInputChange] = useForm({
-        title: 'Evento',
-        notes: '',
-        start: now.toDate(),
-        end: now.add(1,'hours').toDate()
-    })
+    const [formValues, setFormValues] = useState(initEvent)
 
-    const { title, notes } = formValues
+    const { title, notes, start, end } = formValues
 
+    useEffect(() => {
+        
+        if( activeEvent ){
+            setFormValues( activeEvent )
+        } else {
+            setFormValues( initEvent )
+        }
+
+    }, [activeEvent, setFormValues])
+
+    const dispatch = useDispatch()
 
 
     const closeModal = () => {
+
+        dispatch( uiCloseModal() )
+        dispatch( cleanActiveEvent() )
+        setFormValues( initEvent )
+    }
+
+    const handleInputChange = ({ target }) => {
+        setFormValues({
+            ...formValues,
+            [target.name]: target.value
+        })
     }
 
     const handleStartDateChange = (e) => {
         setDateStart( e )
+        setFormValues({
+            ...formValues,
+            start: e
+        })
     }
 
     const handleEndDateChange = (e) => {
         setDateEnd( e )
+        setFormValues({
+            ...formValues,
+            end: e
+        })
+    }
+
+    const handleSubmitForm = (e) => {
+        e.preventDefault()
+
+        const momentStart = moment( start )
+        const momentEnd = moment( end )
+
+        if( momentStart.isSameOrAfter( momentEnd ) ){
+
+            return Swal.fire('Error', 'La fecha fin debe ser mayor a la fecha de inicio', 'error')
+        }
+
+        if( title.trim().length < 2 ){
+
+            return setTitleValid(false)
+        }
+
+        if( activeEvent ){
+
+            dispatch( updateEvent( formValues ) )
+        } else {
+
+            dispatch( createEvent({
+                id: new Date().getTime(),
+                ...formValues,
+                user: {
+                    _id: '123',
+                    name: 'Nicolas'
+                }
+            }))
+        }
+
+        setTitleValid(true)
+        closeModal()
     }
 
     return (
 
         <Modal
-            isOpen={true}
+            isOpen={modalOpen}
             //   onAfterOpen={afterOpenModal}
             onRequestClose={closeModal}
             style={customStyles}
@@ -59,9 +134,9 @@ export const CalendarModal = () => {
             className="modal"
             overlayClassName="modal-fondo"
         >
-            <h1> Nuevo evento </h1>
+            <h1> {(activeEvent)? 'Editar Evento' : 'Nuevo Evento' }</h1>
             <hr />
-            <form className="container">
+            <form onSubmit={handleSubmitForm} className="container">
 
                 <div className="form-group">
                     <label>Fecha y hora inicio</label>
@@ -78,7 +153,7 @@ export const CalendarModal = () => {
                     <label>Titulo y notas</label>
                     <input
                         type="text"
-                        className="form-control"
+                        className={`form-control ${ !titleValid && 'is-invalid' }`}
                         placeholder="Título del evento"
                         name="title"
                         value={title}
