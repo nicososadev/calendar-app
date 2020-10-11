@@ -7,7 +7,7 @@ import '../../styles/calendar/modal.css'
 import Swal from 'sweetalert2';
 import { useDispatch, useSelector } from 'react-redux';
 import { uiCloseModal } from '../../actions/ui';
-import { cleanActiveEvent, createEvent, updateEvent } from '../../actions/events';
+import { cleanCalendar, eventCreateManager, updateEventManager } from '../../actions/events';
 
 const customStyles = {
     content: {
@@ -61,11 +61,12 @@ export const CalendarModal = () => {
     const closeModal = () => {
 
         dispatch( uiCloseModal() )
-        dispatch( cleanActiveEvent() )
+        dispatch( cleanCalendar() )
         setFormValues( initEvent )
     }
 
     const handleInputChange = ({ target }) => {
+
         setFormValues({
             ...formValues,
             [target.name]: target.value
@@ -73,6 +74,7 @@ export const CalendarModal = () => {
     }
 
     const handleStartDateChange = (e) => {
+
         setDateStart( e )
         setFormValues({
             ...formValues,
@@ -81,6 +83,7 @@ export const CalendarModal = () => {
     }
 
     const handleEndDateChange = (e) => {
+
         setDateEnd( e )
         setFormValues({
             ...formValues,
@@ -89,6 +92,7 @@ export const CalendarModal = () => {
     }
 
     const handleSubmitForm = (e) => {
+
         e.preventDefault()
 
         const momentStart = moment( start )
@@ -106,17 +110,10 @@ export const CalendarModal = () => {
 
         if( activeEvent ){
 
-            dispatch( updateEvent( formValues ) )
+            dispatch( updateEventManager( formValues ) )
         } else {
 
-            dispatch( createEvent({
-                id: new Date().getTime(),
-                ...formValues,
-                user: {
-                    _id: '123',
-                    name: 'Nicolas'
-                }
-            }))
+            dispatch( eventCreateManager(formValues) )
         }
 
         setTitleValid(true)
