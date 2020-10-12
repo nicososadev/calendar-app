@@ -11,15 +11,15 @@ export const LoginPage = () => {
     const dispatch = useDispatch()
 
     const initalLoginFormValues = {
-        loginEmail: 'Nicolas@gmail.com',
-        loginPassword: '123456'
+        loginEmail: '',
+        loginPassword: ''
     }
 
     const initalRegisterFormValues = {
-        registerName: 'Sosa',
-        registerEmail: 'Sosa@gmail.com',
-        registerPassword: '123456',
-        registerPassword2: '123456'
+        registerName: '',
+        registerEmail: '',
+        registerPassword: '',
+        registerPassword2: ''
     }
 
     const [ LoginFormValues, handleLoginInputChange ] = useForm(initalLoginFormValues)
@@ -40,7 +40,7 @@ export const LoginPage = () => {
         e.preventDefault()
 
         if ( registerPassword !== registerPassword2 ){
-            Swal.fire('Error', 'Password are not the same', 'error')
+            return Swal.fire('Error', 'Password are not the same', 'error')
         }
         
         dispatch( registerManager(registerName, registerEmail, registerPassword) )
@@ -51,7 +51,7 @@ export const LoginPage = () => {
             <div className="row">
                 <div className="col-md-6 login-form-1">
 
-                    <h3>Ingreso</h3>
+                    <h3>Sign in</h3>
 
                     <form onSubmit={handleLogin}>
 
@@ -82,7 +82,7 @@ export const LoginPage = () => {
 
                 <div className="col-md-6 login-form-2">
 
-                    <h3>Registro</h3>
+                    <h3>Register</h3>
 
                     <form onSubmit={handleRegister}>
 
@@ -125,7 +125,7 @@ export const LoginPage = () => {
                         </div>
 
                         <div className="form-group">
-                            <input type="submit" className="btnSubmit" value="Crear cuenta" />
+                            <input type="submit" className="btnSubmit" value="Create account" />
                         </div>
                     </form>
                 </div>

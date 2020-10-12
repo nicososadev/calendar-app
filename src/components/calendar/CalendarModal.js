@@ -7,7 +7,7 @@ import '../../styles/calendar/modal.css'
 import Swal from 'sweetalert2';
 import { useDispatch, useSelector } from 'react-redux';
 import { uiCloseModal } from '../../actions/ui';
-import { cleanCalendar, eventCreateManager, updateEventManager } from '../../actions/events';
+import { cleanActiveEvent, eventCreateManager, updateEventManager } from '../../actions/events';
 
 const customStyles = {
     content: {
@@ -20,7 +20,9 @@ const customStyles = {
     }
 };
 
-Modal.setAppElement('#root')
+if (process.env.NODE_ENV !== 'test'){
+    Modal.setAppElement('#root')
+}
 
 const now = moment().minutes(0).seconds(0).add(1, 'hours')
 
@@ -61,7 +63,7 @@ export const CalendarModal = () => {
     const closeModal = () => {
 
         dispatch( uiCloseModal() )
-        dispatch( cleanCalendar() )
+        dispatch( cleanActiveEvent() )
         setFormValues( initEvent )
     }
 
@@ -130,6 +132,7 @@ export const CalendarModal = () => {
             closeTimeoutMS={200}
             className="modal"
             overlayClassName="modal-fondo"
+            ariaHideApp={ !process.env.NODE_ENV === 'test' }
         >
             <h1> {(activeEvent)? 'Editar Evento' : 'Nuevo Evento' }</h1>
             <hr />
